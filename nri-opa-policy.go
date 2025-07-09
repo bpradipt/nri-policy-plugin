@@ -189,6 +189,16 @@ func main() {
 		log.Fatalf("failed to create plugin stub: %v", err)
 	}
 
+	if cfg.PolicyFile != "" {
+		policyRaw, err := os.ReadFile(cfg.PolicyFile)
+		if err != nil {
+			log.Fatalf("failed to read OPA policy file: %w", err)
+		}
+		log.Infof("Successfully read policy file")
+		p.policy = string(policyRaw)
+		p.policyRaw = policyRaw
+	}
+
 	err = p.stub.Run(context.Background())
 	if err != nil {
 		log.Errorf("plugin exited with error %v", err)
