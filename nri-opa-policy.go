@@ -73,6 +73,8 @@ func (p *plugin) Configure(_ context.Context, config, runtime, version string) (
 }
 
 func (p *plugin) CreateContainer(_ context.Context, pod *api.PodSandbox, container *api.Container) (*api.ContainerAdjustment, []*api.ContainerUpdate, error) {
+	log.Infof("Starting container (ns/pod/container) %s/%s/%s...", pod.GetNamespace(), pod.GetName(), container.GetName())
+
 	input := map[string]interface{}{
 		"args":   container.Args,
 		"env":    container.Env,
@@ -101,8 +103,10 @@ func (p *plugin) CreateContainer(_ context.Context, pod *api.PodSandbox, contain
 		}
 	}
 	if !allowed {
+		log.Infof("Container (%s) creation denied by policy", container.GetName())
 		return nil, nil, fmt.Errorf("container creation denied by OPA policy")
 	}
+	log.Infof("Container (%s) creation allowed by policy", container.GetName())
 	return &api.ContainerAdjustment{}, nil, nil
 }
 
